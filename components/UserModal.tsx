@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { User, Role } from '../types';
 
@@ -15,6 +14,7 @@ const UserModal: React.FC<UserModalProps> = ({ user, onClose, onSave, roles }) =
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<Role>(roles[roles.length - 1]); // Default to the last role
   const [forcePasswordChange, setForcePasswordChange] = useState(true);
+  const [emailError, setEmailError] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -23,6 +23,7 @@ const UserModal: React.FC<UserModalProps> = ({ user, onClose, onSave, roles }) =
       setRole(user.role);
       setForcePasswordChange(user.forcePasswordChange);
       setPassword(''); // Password field is always cleared for editing
+      setEmailError('');
     } else {
       // Reset for new user
       setUsername('');
@@ -30,11 +31,32 @@ const UserModal: React.FC<UserModalProps> = ({ user, onClose, onSave, roles }) =
       setPassword('');
       setRole(roles[roles.length - 1]);
       setForcePasswordChange(true);
+      setEmailError('');
     }
   }, [user, roles]);
 
+  const validateEmail = (emailToValidate: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(emailToValidate);
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newEmail = e.target.value;
+    setEmail(newEmail);
+    if (emailError && validateEmail(newEmail)) {
+      setEmailError('');
+    }
+  };
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateEmail(email)) {
+      setEmailError('Por favor, insira um formato de e-mail válido.');
+      return;
+    }
+    setEmailError('');
+
     if (user === null && !password) {
       alert("A senha é obrigatória para novos usuários.");
       return;
@@ -73,10 +95,13 @@ const UserModal: React.FC<UserModalProps> = ({ user, onClose, onSave, roles }) =
                 type="email"
                 id="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={handleEmailChange}
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className={`mt-1 block w-full px-3 py-2 border ${emailError ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                aria-invalid={!!emailError}
+                aria-describedby="email-error"
               />
+               {emailError && <p id="email-error" className="mt-2 text-sm text-red-600">{emailError}</p>}
             </div>
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">

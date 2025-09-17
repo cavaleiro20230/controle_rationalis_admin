@@ -8,6 +8,7 @@ import UserModal from './components/UserModal';
 import SearchBar from './components/SearchBar';
 import ConfirmationModal from './components/ConfirmationModal';
 import ActivityLogView from './components/ActivityLogView';
+import Login from './components/Login';
 
 const initialUsers: User[] = [
   { id: 1, username: 'ana.silva', email: 'ana.silva@example.com', role: Role.Superintendente, forcePasswordChange: false },
@@ -24,6 +25,7 @@ const App: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [currentView, setCurrentView] = useState<'users' | 'logs'>('users');
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [userToReset, setUserToReset] = useState<User | null>(null);
@@ -37,13 +39,32 @@ const App: React.FC = () => {
         timestamp: new Date().toISOString(),
       };
       const existingLogs: ActivityLog[] = JSON.parse(localStorage.getItem('activityLogs') || '[]');
-      // Prepend new logs and keep the list to a reasonable size (e.g., 100 entries)
       const updatedLogs = [newLog, ...existingLogs].slice(0, 100);
       localStorage.setItem('activityLogs', JSON.stringify(updatedLogs));
     } catch (error) {
       console.error("Failed to write to activity log:", error);
     }
   }, []);
+  
+  const handleLogin = useCallback((username: string, password: string): boolean => {
+    const user = initialUsers.find(u => u.username === username);
+    // In a real app, you would check a hashed password.
+    // Here, we simulate by checking the role and a static password.
+    if (user && user.role === Role.Superintendente && password === 'adminpass') {
+      setCurrentUser(user);
+      logActivity('Login', user.username);
+      return true;
+    }
+    return false;
+  }, [logActivity]);
+
+  const handleLogout = useCallback(() => {
+    if (currentUser) {
+      logActivity('Logout', currentUser.username);
+      setCurrentUser(null);
+    }
+  }, [currentUser, logActivity]);
+
 
   const filteredUsers = useMemo(() => {
     const lowercasedFilter = searchTerm.toLowerCase();
@@ -106,11 +127,17 @@ const App: React.FC = () => {
     }
   }, [userToReset, logActivity]);
 
+  if (!currentUser) {
+    return <Login onLogin={handleLogin} />;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 font-sans text-gray-800">
       <Header 
+        currentUser={currentUser}
         onAddUser={() => handleOpenModal(null)} 
         onShowLogs={() => setCurrentView('logs')}
+        onLogout={handleLogout}
       />
       
       {currentView === 'users' ? (

@@ -1,14 +1,18 @@
 
 import React from 'react';
+import { User } from '../types';
 import { PlusIcon } from './icons/PlusIcon';
 import { LogIcon } from './icons/LogIcon';
+import { LogoutIcon } from './icons/LogoutIcon';
 
 interface HeaderProps {
+  currentUser: User;
   onAddUser: () => void;
   onShowLogs: () => void;
+  onLogout: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onAddUser, onShowLogs }) => {
+const Header: React.FC<HeaderProps> = ({ currentUser, onAddUser, onShowLogs, onLogout }) => {
   return (
     <header className="bg-white shadow-md">
       <div className="container mx-auto px-4 md:px-8 py-4 flex justify-between items-center">
@@ -20,21 +24,37 @@ const Header: React.FC<HeaderProps> = ({ onAddUser, onShowLogs }) => {
             </div>
             <h1 className="text-xl md:text-2xl font-bold text-gray-800">Sistema de Administração</h1>
         </div>
-        <div className="flex items-center space-x-2">
-            <button
-                onClick={onShowLogs}
-                className="flex items-center space-x-2 bg-gray-600 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:bg-gray-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
-            >
-                <LogIcon className="w-5 h-5" />
-                <span className="hidden md:inline">Ver Logs</span>
-            </button>
-            <button
-            onClick={onAddUser}
-            className="flex items-center space-x-2 bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-            >
-            <PlusIcon className="w-5 h-5" />
-            <span className="hidden md:inline">Adicionar Usuário</span>
-            </button>
+        <div className="flex items-center space-x-4">
+            <div className="text-right">
+                <p className="text-sm font-medium text-gray-800">Bem-vindo, {currentUser.username}</p>
+                <p className="text-xs text-gray-500">{currentUser.role}</p>
+            </div>
+            <div className="flex items-center space-x-2">
+                <button
+                    onClick={onShowLogs}
+                    className="flex items-center space-x-2 bg-gray-600 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:bg-gray-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+                    title="Ver Logs"
+                >
+                    <LogIcon className="w-5 h-5" />
+                    <span className="hidden md:inline">Logs</span>
+                </button>
+                <button
+                onClick={onAddUser}
+                className="flex items-center space-x-2 bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                title="Adicionar Usuário"
+                >
+                <PlusIcon className="w-5 h-5" />
+                <span className="hidden md:inline">Adicionar</span>
+                </button>
+                <button
+                onClick={onLogout}
+                className="flex items-center space-x-2 bg-red-600 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:bg-red-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+                title="Sair"
+                >
+                <LogoutIcon className="w-5 h-5" />
+                <span className="hidden md:inline">Sair</span>
+                </button>
+            </div>
         </div>
       </div>
     </header>
