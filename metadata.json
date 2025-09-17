@@ -1,0 +1,5 @@
+{
+  "name": "User Administration System",
+  "description": "A system to manage users, roles, and permissions. Allows for user creation, password resets, and role assignments for Superintendents, Managers, Coordinators, and Collaborators.",
+  "requestFramePermissions": []
+}
